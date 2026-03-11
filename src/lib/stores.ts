@@ -84,5 +84,6 @@ export function getStorePrefix(slug: string): string {
 }
 
 // Admin credentials (in production, store hashed in DB)
-export const ADMIN_USERNAME = 'admin';
+export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'shorty2024';
 export const ADMIN_PASSWORD_HASH = '$2a$10$XQxBj8JETH0Zjv0C8f8Gu.oaYKFqHh2QE8K8q6v5mZz5v5aqLC3u6'; // "shorty2024"

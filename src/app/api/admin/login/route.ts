@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ADMIN_USERNAME } from '@/lib/stores';
+import { ADMIN_USERNAME, ADMIN_PASSWORD } from '@/lib/stores';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { username, password } = body;
 
     // Simple auth check (in production, use bcrypt + DB)
-    if (username === ADMIN_USERNAME && password === 'shorty2024') {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       const response = NextResponse.json({ success: true });
       // Set a session cookie
       response.cookies.set('admin_session', 'authenticated', {
