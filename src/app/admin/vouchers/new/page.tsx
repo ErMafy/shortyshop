@@ -16,6 +16,8 @@ interface CreatedVoucher {
   first_name: string;
   last_name: string;
   store: Store;
+  email_sent?: boolean;
+  email_error?: string | null;
 }
 
 export default function AdminCreateVoucherPage() {
@@ -238,6 +240,26 @@ export default function AdminCreateVoucherPage() {
               </p>
             </div>
 
+            {/* Email status feedback */}
+            {created.email_sent && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <p className="text-green-700 text-sm">
+                  Email con voucher PDF inviata con successo!
+                </p>
+              </div>
+            )}
+            {created.email_error && (
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center gap-3">
+                <svg className="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-yellow-700 text-sm">{created.email_error}</p>
+              </div>
+            )}
+
             {/* Voucher Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
               <div className="bg-gradient-to-r from-gray-950 to-gray-800 p-6 text-white">
@@ -378,6 +400,9 @@ export default function AdminCreateVoucherPage() {
                       placeholder="nome@email.com"
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-400 transition-all text-sm"
                     />
+                    <p className="mt-1 text-xs text-gray-400">
+                      Se inserita, il voucher PDF verrà inviato via email al cliente.
+                    </p>
                   </div>
                 </div>
 

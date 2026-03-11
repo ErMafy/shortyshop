@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getStoreBySlug, STORES } from '@/lib/stores';
 import { generateVoucherCode, generateRedeemToken } from '@/lib/voucher-utils';
+import { generateVoucherPdf } from '@/lib/generateVoucherPdf';
+import { sendVoucherEmail } from '@/lib/sendVoucherEmail';
 
 export async function POST(request: NextRequest) {
   // Auth check
@@ -87,6 +89,42 @@ export async function POST(request: NextRequest) {
       used_by_admin: null,
     });
 
+    // Send email with PDF if email is provided
+    let emailSent = false;
+    let emailError: string | null = null;
+    const customerEmail = email?.trim();
+
+    if (customerEmail) {
+      try {
+        const baseUrl = request.headers.get('origin') || request.headers.get('x-forwarded-proto') + '://' + request.headers.get('host') || 'http://localhost:3000';
+
+        const pdfBuffer = await generateVoucherPdf({
+          firstName: first_name.trim(),
+          lastName: last_name.trim(),
+          storeName: store.name,
+          amount: voucherAmount,
+          voucherCode,
+          expiresAt: expiryDate,
+          redeemToken,
+          baseUrl,
+        });
+
+        await sendVoucherEmail({
+          email: customerEmail,
+          name: `${first_name.trim()} ${last_name.trim()}`,
+          voucherCode,
+          store: store.name,
+          amount: voucherAmount,
+          pdfBuffer,
+        });
+
+        emailSent = true;
+      } catch (err) {
+        console.error('Errore invio email voucher:', err);
+        emailError = 'Voucher creato ma invio email fallito';
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -98,6 +136,8 @@ export async function POST(request: NextRequest) {
         first_name: voucher.first_name,
         last_name: voucher.last_name,
         store: store,
+        email_sent: emailSent,
+        email_error: emailError,
       },
     });
   } catch {
